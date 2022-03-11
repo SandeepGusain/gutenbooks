@@ -29,13 +29,19 @@ class Book(db.Model):
 
 
 class BookAuthor(db.Model):
-    __tablename__ = 'books_book_author'
+    __tablename__ = 'books_book_authors'
 
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey(
         'books_book.id'), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey(
         'books_author.id'), nullable=False)
+
+
+    def serialize(self):
+        return {
+            'author_id': self.author_id
+        }
 
 
 class BookLocation(db.Model):
@@ -47,6 +53,11 @@ class BookLocation(db.Model):
     bookshelf_id = db.Column(db.Integer, db.ForeignKey(
         'books_bookshelf.id'), nullable=False)
 
+    def serialize(self):
+        return {
+            "bookshelf_id": self.bookshelf_id
+        }
+
 
 class BookLanguage(db.Model):
     __tablename__ = 'books_book_languages'
@@ -57,6 +68,11 @@ class BookLanguage(db.Model):
     language_id = db.Column(db.Integer, db.ForeignKey(
         'books_language.id'), nullable=False)
 
+    def serialize(self):
+        return {
+            "language_id": self.language_id
+        }
+
 
 class BookSubject(db.Model):
     __tablename__ = 'books_book_subjects'
@@ -66,6 +82,12 @@ class BookSubject(db.Model):
         'books_book.id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey(
         'books_subject.id'), nullable=False)
+
+
+    def serialize(self):
+        return {
+            "subject_id": self.subject_id
+        }
 
 
 class Bookshelf(db.Model):
