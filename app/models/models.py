@@ -9,6 +9,10 @@ class Author(db.Model):
     birth_year = db.Column(db.Integer)
     death_year = db.Column(db.Integer)
 
+    def serialize(self):
+        return {
+            'name': self.name
+        }
 
 class Book(db.Model):
     __tablename__ = 'books_book'
@@ -18,13 +22,22 @@ class Book(db.Model):
     media_type = db.Column(db.String)
     gutenberg_id = db.Column(db.Integer)
     download_count = db.Column(db.Integer)
+    author = db.relationship("BookAuthor", backref="books_book")
+    bookshelf = db.relationship("BookLocation", backref="books_book")
+    language = db.relationship("BookLanguage", backref="books_book")
+    subject = db.relationship("BookSubject", backref="books_book")
+    links = db.relationship("Format", backref="books_book")
 
     def serialize(self):
         return {
             'id': self.id,
             'title': self.title,
-            'media_type': self.media_type,
-            'download_count': self.download_count
+            'download_count': self.download_count,
+            'author': [author.serialize() for author in self.author],
+            'bookshelf(s)': [location.serialize() for location in self.bookshelf],
+            'language': [lang.serialize() for lang in self.language],
+            'subject(s)': [topic.serialize() for topic in self.subject],
+            'url(s)': [url.serialize()  for url in self.links]
         }
 
 
@@ -36,12 +49,10 @@ class BookAuthor(db.Model):
         'books_book.id'), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey(
         'books_author.id'), nullable=False)
-
+    author = db.relationship("Author", backref="books_book_authors")
 
     def serialize(self):
-        return {
-            'author_id': self.author_id
-        }
+        return self.author.serialize()
 
 
 class BookLocation(db.Model):
@@ -52,12 +63,10 @@ class BookLocation(db.Model):
         'books_book.id'), nullable=False)
     bookshelf_id = db.Column(db.Integer, db.ForeignKey(
         'books_bookshelf.id'), nullable=False)
+    bookshelf = db.relationship("Bookshelf", backref="books_book_bookshelves")
 
     def serialize(self):
-        return {
-            "bookshelf_id": self.bookshelf_id
-        }
-
+        return self.bookshelf.serialize()
 
 class BookLanguage(db.Model):
     __tablename__ = 'books_book_languages'
@@ -67,11 +76,10 @@ class BookLanguage(db.Model):
         'books_book.id'), nullable=False)
     language_id = db.Column(db.Integer, db.ForeignKey(
         'books_language.id'), nullable=False)
+    language = db.relationship("Language", backref="books_book_languages")
 
     def serialize(self):
-        return {
-            "language_id": self.language_id
-        }
+        return self.language.serialize()
 
 
 class BookSubject(db.Model):
@@ -82,12 +90,10 @@ class BookSubject(db.Model):
         'books_book.id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey(
         'books_subject.id'), nullable=False)
-
+    subject = db.relationship("Subject", backref="books_book_subjects")
 
     def serialize(self):
-        return {
-            "subject_id": self.subject_id
-        }
+        return self.subject.serialize()
 
 
 class Bookshelf(db.Model):
@@ -95,6 +101,9 @@ class Bookshelf(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+
+    def serialize(self):
+        return self.name
 
 
 class Format(db.Model):
@@ -106,6 +115,8 @@ class Format(db.Model):
     mime_type = db.Column(db.String)
     url = db.Column(db.String)
 
+    def serialize(self):
+        return self.url
 
 class Language(db.Model):
     __tablename__ = 'books_language'
@@ -114,9 +125,7 @@ class Language(db.Model):
     code = db.Column(db.String)
 
     def serialize(self):
-        return {
-            'lang': self.code
-        }
+        return self.code
 
 
 class Subject(db.Model):
@@ -124,3 +133,6 @@ class Subject(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+
+    def serialize(self):
+        return self.name

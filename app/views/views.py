@@ -32,7 +32,15 @@ def filter_books(page: int = 1):
             books = books.filter(Book.title.ilike(f"%{query_params['title']}%"))
         if query_params.get("author"):
             books = books.join(BookAuthor).join(Author).filter(Author.name.ilike(f"%{query_params['author']}%"))
-
+        if query_params.get("topic"):
+            books = books.distinct(
+                        ).join(BookSubject
+                        ).join(Subject
+                        ).join(BookLocation
+                        ).join(Bookshelf).filter(
+                            (Subject.name.ilike(f"%{query_params['topic']}%"))
+                        | (Bookshelf.name.ilike(f"%{query_params['topic']}%")))
+            
         count = books.count()
         books = books.order_by(
                 Book.download_count.is_(None),
@@ -45,4 +53,4 @@ def filter_books(page: int = 1):
             ]
         }
         )
-    return {"message": f"Invalid field present: {err}"}
+    return {"message": f"Invalid field(s) present: {err}"}
