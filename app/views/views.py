@@ -15,6 +15,7 @@ def validate_fields(args):
     return set(args)-FILTERS
 
 @mod_book.route("/search/<int:page>", methods=["GET"])
+@mod_book.route("/search")
 def filter_books(page: int = 1):
     query_params = request.args
     err = validate_fields(query_params.keys())
