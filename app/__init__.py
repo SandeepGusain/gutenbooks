@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 
 # get folder containing .env file and load environment variables
-project_folder = os.getcwd()
+project_folder = os.path.dirname(os.path.dirname(__file__))
 load_dotenv(os.path.join(project_folder, '.env'))
 
 app = Flask(__name__)
